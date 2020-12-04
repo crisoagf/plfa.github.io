@@ -25,6 +25,8 @@ open Eq using (_≡_; refl; cong; cong-app)
 open Eq.≡-Reasoning
 open import Data.Nat using (ℕ; zero; suc; _+_)
 open import Data.Nat.Properties using (+-comm)
+open import plfa.part1.Induction using (Bin)
+import plfa.part1.Induction as Induction
 ```
 
 
@@ -439,8 +441,7 @@ open ≲-Reasoning
 
 Show that every isomorphism implies an embedding.
 ```
-postulate
-  ≃-implies-≲ : ∀ {A B : Set}
+≃-implies-≲ : ∀ {A B : Set}
     → A ≃ B
       -----
     → A ≲ B
@@ -448,6 +449,11 @@ postulate
 
 ```
 -- Your code goes here
+≃-implies-≲ A≃B = record
+  { to = to A≃B
+  ; from = from A≃B
+  ; from∘to = from∘to A≃B
+  }
 ```
 
 #### Exercise `_⇔_` (practice) {name=iff}
@@ -463,6 +469,16 @@ Show that equivalence is reflexive, symmetric, and transitive.
 
 ```
 -- Your code goes here
+⇔-refl : ∀ { A B : Set } → A ⇔ A
+⇔-refl = record { to = \ a → a; from = \ a → a }
+
+⇔-sym : ∀ { A B : Set } → A ⇔ B → B ⇔ A
+⇔-sym A⇔B = record { to = from A⇔B; from = to A⇔B }
+  where open _⇔_
+
+⇔-trans : ∀ { A B C : Set } → A ⇔ B → B ⇔ C → A ⇔ C
+⇔-trans A⇔B B⇔C = record { to = to B⇔C ∘ to A⇔B ; from = from A⇔B ∘ from B⇔C }
+  where open _⇔_
 ```
 
 #### Exercise `Bin-embedding` (stretch) {name=Bin-embedding}
@@ -483,9 +499,15 @@ which satisfy the following property:
 Using the above, establish that there is an embedding of `ℕ` into `Bin`.
 ```
 -- Your code goes here
+ℕ≲Bin : ℕ ≲ Bin
+ℕ≲Bin = record
+  { to = Induction.to
+  ; from = Induction.from
+  ; from∘to = Induction.law3
+  }
 ```
 
-Why do `to` and `from` not form an isomorphism?
+Why do `to` and `from` not form an isomorphism? (`(to ∘ from) ⟨⟩ = ⟨⟩ O !≡ ⟨⟩`)
 
 ## Standard library
 
