@@ -414,7 +414,7 @@ Consider the following principles:
 Show that each of these implies all the others.
 
 ```
--- Your code goes here
+-- You can get the remaining implications by composition.
 em-to-dne : (∀ (A : Set) → A ⊎ ¬ A ) → ∀ (A : Set) → ¬ ¬ A → A
 em-to-dne em A notnota with em A
 ...                       | inj₁ a = a
@@ -426,16 +426,20 @@ em-to-peirce : (∀ (A : Set) → A ⊎ ¬ A) → ∀ (A B : Set) → ((A → B)
 em-to-peirce em A B f with em A
 ...                      | inj₁ a = a
 ...                      | inj₂ nota = f (λ { a → ⊥-elim (nota a) })
--- dne-to-peirce = em-to-peirce ∘ dne-to-em
 peirce-to-dne : (∀ (A B : Set) → ((A → B) → A) → A) → ∀ (A : Set) → ¬ ¬ A → A
 peirce-to-dne peirce A notnota = peirce A ⊥ (λ (nota : A → ⊥) → ⊥-elim (notnota nota))
--- peirce-to-em = dne-to-em ∘ peirce-to-dne
 em-to-→disj : (∀ (A : Set) → A ⊎ ¬ A) → ∀ (A B : Set) → (A → B) → ¬ A ⊎ B
 em-to-→disj em A B f with em A
 ...                     | inj₁ a    = inj₂ (f a)
 ...                     | inj₂ nota = inj₁ nota
 →disj-to-em : (∀ (A B : Set) → (A → B) → ¬ A ⊎ B) → ∀ (A : Set) → A ⊎ (¬ A)
 →disj-to-em →disj A = swap (→disj A A (λ x → x))
+em-to-demorgan : (∀ (A : Set) → A ⊎ ¬ A) → ∀ (A B : Set) → ¬ (¬ A × ¬ B) → A ⊎ B
+em-to-demorgan em A B ¬¬A×¬B with (em A)
+...                             | (inj₁ a) = inj₁ a
+...                             | (inj₂ ¬A) = inj₂ (em-to-dne em B (λ ¬B → ¬¬A×¬B ( ¬A , ¬B )))
+demorgan-to-em : (∀ (A B : Set) → ¬ (¬ A × ¬ B) → A ⊎ B) → ∀ (A : Set) → A ⊎ ¬ A
+demorgan-to-em demorgan A = demorgan A (¬ A) (λ x → em-irrefutable (_≃_.from ¬⊎-≃-¬× x))
 ```
 
 
