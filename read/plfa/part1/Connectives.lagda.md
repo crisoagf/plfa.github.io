@@ -827,9 +827,12 @@ Does the converse hold? If so, prove; if not, give a counterexample.
 thing : (⊥ ⊎ ⊤) × (⊤ ⊎ ⊥)
 thing = ⟨ inj₂ tt , inj₁ tt ⟩
 
-notthing : (⊥ × ⊤) ⊎ (⊤ × ⊥) → ⊥
-notthing (inj₁ ⟨ absurd , _ ⟩) = absurd
-notthing (inj₂ ⟨ _ , absurd ⟩) = absurd
+¬×⊎-implies-⊎× : (∀ {A B C D : Set} → (A ⊎ C) × (B ⊎ D) → (A × B) ⊎ (C × D)) → ⊥
+¬×⊎-implies-⊎× f = notthing (f thing)
+  where
+    notthing : (⊥ × ⊤) ⊎ (⊤ × ⊥) → ⊥
+    notthing (inj₁ ⟨ () , _ ⟩)
+    notthing (inj₂ ⟨ _ , () ⟩)
 
 ```
 
