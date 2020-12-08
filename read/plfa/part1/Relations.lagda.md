@@ -957,9 +957,10 @@ doubleIsShiftL (n O) rewrite doubleIsShiftL n = refl
 doubleIsShiftL (n I) rewrite doubleIsShiftL n = refl
 
 toFromCanonical : { n : Bin } → Can n → to (from n) ≡ n
-toFromCanonical is0 = refl
-toFromCanonical (isOne leadingI) = refl
-toFromCanonical {x O} (isOne (n O)) = begin
+toFromNO : { n : Bin } → Can (n O) → to (from (n O)) ≡ n O
+
+toFromNO {⟨⟩} is0 = refl
+toFromNO {x} (isOne (n O)) =  begin
   to (from (x O))
   ≡⟨⟩
   to (from x + (from x + 0))
@@ -975,25 +976,17 @@ toFromCanonical {x O} (isOne (n O)) = begin
   x O
   ∎
   where open Eq.≡-Reasoning
+
+toFromCanonical is0 = refl
+toFromCanonical (isOne leadingI) = refl
+toFromCanonical {x O} (isOne (n O)) = toFromNO (isOne (n O))
 toFromCanonical {x I} (isOne (n I)) = begin
   to (from (x I))
   ≡⟨⟩
   to (suc (from x + (from x + 0)))
   ≡⟨⟩
   inc (to (from x + (from x + 0)))
-  ≡⟨ cong inc (begin
-    to (from x + (from x + 0))
-    ≡⟨ cong to (cong (from x +_) (+-identityʳ (from x))) ⟩
-    to (from x + from x)
-    ≡⟨ toHomo (from x) (from x) ⟩
-    to (from x) |+| to (from x)
-    ≡⟨ cong (to (from x) |+|_) (toFromCanonical (isOne n)) ⟩
-    to (from x) |+| x
-    ≡⟨ cong (_|+| x) (toFromCanonical (isOne n)) ⟩
-    x |+| x
-    ≡⟨ doubleIsShiftL n ⟩
-    x O
-    ∎) ⟩
+  ≡⟨ cong inc (toFromNO (isOne (n O))) ⟩
   inc (x O)
   ∎
   where open Eq.≡-Reasoning
